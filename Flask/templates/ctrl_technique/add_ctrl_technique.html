@@ -1,0 +1,49 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+<title>Ajouter un controle technique</title>
+{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card shadow-lg">
+        <div class="card-header bg-primary text-white text-center">
+          <h4>Ajouter un controle technique</h4>
+        </div>
+        <div class="card-body">
+          <form method="post" action="/ctrl-technique/add">
+
+            <div class="mb-3">
+              <label for="dateCtrlTechnique" class="form-label">Date du controle technique</label>
+              <input id="dateCtrlTechnique" type="date" name="dateCtrlTechnique" class="form-control" placeholder="Saisir la date du controle technique" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="kilometrage" class="form-label">Kilométrage du véhicule</label>
+              <input id="kilometrage" type="number" name="kilometrage" class="form-control" placeholder="Saisir le kilométrage du véhicule">
+            </div>
+
+
+              <div class="mb-3">
+              <label for="bus_id" class="form-label">Bus</label>
+              <select id="bus_id" name="bus_id" class="form-select jaune" required>
+                <option value="">Sélectionner un bus</option>
+                {% for type in bus %}
+                <option value="{{ type.id }}">{{ type.id }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="d-grid">
+              <button type="submit" class="btn btn-success">Créer</button>
+            </div>
+
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
