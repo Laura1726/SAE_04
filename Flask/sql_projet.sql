@@ -129,10 +129,12 @@ CREATE TABLE consomme(
 );
 
 
-INSERT INTO ville (nom_ville) VALUES ('Paris');
+INSERT INTO ville (nom_ville) VALUES ('Paris'),
+                                     ('Montbéliard');
 
-INSERT INTO station (nom_station) VALUES ('Station Nord'),
-                                         ('Station Sud');
+INSERT INTO station (nom_station) VALUES ('Station Nord Paris'),
+                                         ('Station Sud Paris'),
+                                         ('Station Comte Est Montbe');
 
 INSERT INTO mois (libelle_mois) VALUES ('Janvier'),
                                        ('Février'),
@@ -144,17 +146,24 @@ INSERT INTO modele (capacite_stockage, pression) VALUES (200.0, 250.0),
 INSERT INTO categorie (libelle_categorie) VALUES ('Mécanique'),
                                                  ('Électrique');
 
-INSERT INTO entreprise (nom_entreprise, ville_id) VALUES ('HydroParis', 1);
+INSERT INTO entreprise (nom_entreprise, ville_id) VALUES ('HydroParis', 1),
+                                                         ('Monthydro',2);
 
 INSERT INTO bus (poids, nb_passager, date_achat, entreprise_id)
 VALUES (8000, 50, '2020-01-10', 1),
        (8100, 55, '2021-03-20', 1),
-       (8200, 60, '2022-06-10', 1);
+       (8200, 60, '2022-06-10', 1),
+       (8150,65,'2025-08-11',2),
+       (6950,40,'2024-04-17',2),
+       (7500,45,'2023-12-25',2);
 
 INSERT INTO controle_technique (date_controle_technique, kilometrage, bus_id)
 VALUES ('2024-01-10', 50000, 1),
        ('2024-02-15', 48000, 2),
-       ('2024-03-05', 30000, 3);
+       ('2024-03-05', 30000, 3),
+       ('2025-11-24',245789,4),
+       ('2024-12-31',10000,5),
+       ('2025-02-12',398675,6);
 
 INSERT INTO reservoir (libelle_reservoir, entreprise_id_reservoir, modele_id)
 VALUES ('HydroMax', 1, 1),
@@ -175,12 +184,18 @@ INSERT INTO se_ravitaille (bus_id_ravitaille, station_id_ravitaille, jj_mm_aaaa,
 VALUES (1, 1, '2024-01-05', 120.5),
        (1, 2, '2024-02-06', 140.0),
        (2, 1, '2024-03-07', 130.0),
-       (3, 2, '2024-03-20', 150.0);
+       (3, 2, '2024-03-20', 150.0),
+       (4,3,'2025-11-23',125.3),
+       (5,3,'2025-10-24',110.0),
+       (6,3,'2025-11-19',121.3);
 
 INSERT INTO possede (bus_id_possede, reservoir_id_possede, date_installe)
 VALUES (1, 1, '2020-01-15'),
        (2, 2, '2021-03-20'),
-       (3, 3, '2022-06-10');
+       (3, 3, '2022-06-10'),
+       (4, 1, '2025-06-10'),
+       (5, 3, '2024-06-10'),
+       (6, 2, '2023-06-10');
 
 INSERT INTO parcours (bus_id_parcours, mois_id, nb_kilometre_parcourus)
 VALUES (1, 1, 1553.0),
@@ -188,7 +203,10 @@ VALUES (1, 1, 1553.0),
        (2, 1, 1332.0),
        (2, 2, 1630.0),
        (3, 1, 1299.0),
-       (3, 2, 1578.0);
+       (3, 2, 1578.0),
+       (4, 2, 1778.0),
+       (5, 1, 1478.0),
+       (6, 3, 1878.0);
 
 INSERT INTO consomme (bus_id_consomme, annee_id, consommation_annuel)
 VALUES (1, 2024, 2500.0),
@@ -196,7 +214,10 @@ VALUES (1, 2024, 2500.0),
        (3, 2024, 2423.0),
        (1,2025,1245.0),
        (1,2023,2678.9),
-       (2,2025,2376.0);
+       (2,2025,2376.0),
+       (4,2025,1276.0),
+       (5,2025,2576.0),
+       (6,2024,3376.0);
 
 
 SELECT e.nom_entreprise,AVG(c.consommation_annuel) AS consommation_moyenne

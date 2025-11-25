@@ -1,25 +1,67 @@
-<nav class="navbar navbar-expand-lg bg-body-tertiary ">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
-        <div class="collapse navbar-collapse" id="navbarText">
-            <a href="/">
-                <img src="/static/images/salle-de-cours.png" class="logo" alt="image salle cours">
-            </a>
-            S1 BDD 30
-          <ul class="nav nav-pills">
-            <li class="nav-item me-2">
-              <a href="/probleme/show" class="btn btn-info"> Probleme (Lucas F) </a>
-            </li>
-            <li class="nav-item me-2">
-              <a href="/bus/show" class="btn btn-info"> Bus (Kevin P)</a>
-            </li>
-              <li class="nav-item">
-              <a href="/ctrl-technique/show" class="btn btn-info"> Controle Technique (Laura B)</a>
-            </li>
-              <li class="nav-item">
-              <a href="/reservoir/show" class="btn btn-info"> Reservoir (Danis H)</a>
-            </li>
-          </ul>
+        <a class="navbar-brand d-flex align-items-center" href="/">
+            <img src="/static/autobus.png" class="logo me-2" alt="image hydrobus" style="height: 40px;">
+            <span class="fw-bold">SAE 04 - HydroBus</span>
+        </a>
 
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
+                aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNavDropdown">
+            <ul class="navbar-nav ms-auto">
+
+                <!-- Menu Problème (Lucas F) -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Problème (Lucas F)
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="/probleme/show">Afficher les Problèmes</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="/etat/probleme">État : Statistiques Problèmes</a></li>
+                    </ul>
+                </li>
+
+                <!-- Menu Bus (Kevin P) -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Bus (Kevin P)
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="/bus/show">Afficher les Bus</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="/etat/bus">État : Flotte de Bus</a></li>
+                    </ul>
+                </li>
+
+                <!-- Menu Contrôle Technique (Laura B) -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Contrôle Technique (Laura B)
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="/ctrl-technique/show">Afficher les Contrôles Techniques</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="/etat/ctrl-technique">État : Statistiques Contrôles</a></li>
+                    </ul>
+                </li>
+
+                <!-- Menu Réservoir (Danis H) -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Réservoir (Danis H)
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="/reservoir/show">Afficher les Réservoirs</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="/etat/reservoir">État : Réservoirs H2</a></li>
+                    </ul>
+                </li>
+
+            </ul>
         </div>
     </div>
 </nav>

@@ -181,5 +181,38 @@ def delete_ctrl_technique():
     return redirect('/ctrl-technique/show')
 
 
+@app.route('/etat/ctrl-technique', methods=['GET'])
+def etat_ctrl_technique():
+    mycursor = get_db().cursor()
+
+    # stats global des controles techniques
+    sql= '''
+                         SELECT COUNT(DISTINCT ct.id_ctrl_technique) AS total_controles,
+                                COUNT(DISTINCT ct.bus_id) AS nb_bus_controles,
+                                AVG(ct.kilometrage) AS kilometrage_moyen,
+                                MAX(ct.kilometrage) AS kilometrage_max,
+                                MIN(ct.kilometrage) AS kilometrage_min,
+                                MAX(ct.date_controle_technique) AS dernier_controle,
+                                MIN(ct.date_controle_technique) AS premier_controle
+                         FROM controle_technique ct
+                         '''
+    mycursor.execute(sql)
+    stats_globales = mycursor.fetchone()
+
+    # stats par entreprise
+    sql = '''
+                           SELECT e.nom_entreprise,COUNT(ct.id_ctrl_technique) AS nb_controles,AVG(ct.kilometrage) AS km_moyen,COUNT(DISTINCT ct.bus_id) AS nb_bus_entreprise
+                           FROM controle_technique ct
+                            JOIN bus b ON b.id_bus = ct.bus_id
+                            JOIN entreprise e ON e.id_entreprise = b.entreprise_id
+                           GROUP BY e.id_entreprise, e.nom_entreprise
+                           ORDER BY nb_controles ASC
+                           '''
+    mycursor.execute(sql)
+    stats_entreprise = mycursor.fetchall()
+
+    return render_template('ctrl_technique/etat_ctrl_technique.html',stats_globales=stats_globales,stats_entreprise=stats_entreprise)
+
+
 if __name__ == '__main__':
     app.run()

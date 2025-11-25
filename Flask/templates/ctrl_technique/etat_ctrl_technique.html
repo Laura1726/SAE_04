@@ -1,0 +1,100 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+<title>État des contrôles techniques</title>
+{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-12">
+      <div class="card shadow-lg">
+        <div class="card-header bg-primary text-white text-center">
+          <h4>État des controles techniques</h4>
+        </div>
+        <div class="card-body">
+
+          <div class="alert alert-info mb-4">
+            <h5 class="mb-3">Statistiques globales des controles techniques :</h5>
+            {% if stats_globales %}
+            <div class="row">
+              <div class="col-md-3">
+                <p class="mb-2">
+                  <span class="gras">Total controles :</span><br>
+                  <span class="fs-4 text-primary">{{ stats_globales.total_controles }}</span>
+                </p>
+              </div>
+              <div class="col-md-3">
+                <p class="mb-2">
+                  <span class="gras">Bus controlés :</span><br>
+                  <span class="fs-4 text-success">{{ stats_globales.nb_bus_controles }}</span>
+                </p>
+              </div>
+              <div class="col-md-3">
+                <p class="mb-2">
+                  <span class="gras">Kilométrage moyen :</span><br>
+                  <span class="fs-4 text-warning">{{ stats_globales.kilometrage_moyen }} km</span>
+                </p>
+              </div>
+              <div class="col-md-3">
+                <p class="mb-2">
+                  <span class="gras">Période :</span><br>
+                  <span class="fs-6">du {{ stats_globales.premier_controle }} au {{ stats_globales.dernier_controle }}</span>
+                </p>
+              </div>
+            </div>
+            <div class="row mt-3">
+              <div class="col-md-6">
+                <p class="mb-0">
+                  <span class="gras">Kilométrage min :</span> {{ stats_globales.kilometrage_min }} km
+                </p>
+              </div>
+              <div class="col-md-6">
+                <p class="mb-0">
+                  <span class="gras">Kilométrage max :</span> {{ stats_globales.kilometrage_max }} km
+                </p>
+              </div>
+            </div>
+            {% endif %}
+          </div>
+
+          <h5 class="mb-3"> Statistiques par entreprise :</h5>
+          <div class="table-responsive mb-5">
+            <table class="table table-striped table-bordered align-middle">
+              <thead class="table-dark">
+                <tr>
+                  <th>Entreprise</th>
+                  <th>Nombre de contrôles</th>
+                  <th>Nombre de bus</th>
+                  <th>Kilométrage moyen</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% if stats_entreprise | length >= 1 %}
+                  {% for stat in stats_entreprise %}
+                    <tr>
+                      <td><span class="gras">{{ stat.nom_entreprise }}</span></td>
+                      <td class="text-center">
+                        <span class="badge bg-primary fs-6">{{ stat.nb_controles }}</span>
+                      </td>
+                      <td class="text-center">{{ stat.nb_bus_entreprise }}</td>
+                      <td class="text-end">{{ stat.km_moyen }} km</td>
+                    </tr>
+                  {% endfor %}
+                {% else %}
+                  <tr>
+                    <td colspan="4" class="text-center text-muted">
+                      Aucune statistique disponible
+                    </td>
+                  </tr>
+                {% endif %}
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
