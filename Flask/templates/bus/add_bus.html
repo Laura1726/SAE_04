@@ -1,0 +1,64 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+<title>Ajouter un bus</title>
+{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card shadow-lg">
+        <div class="card-header bg-primary text-white text-center">
+          <h4>Ajouter un bus</h4>
+        </div>
+        <div class="card-body">
+          <form method="post" action="/bus/add">
+
+            <div class="mb-3">
+              <label for="poids" class="form-label">Poids</label>
+              <input id="poids" type="number" name="poids" class="form-control" placeholder="Saisir le poids du bus" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="nb_passager" class="form-label">Nombre de passager</label>
+              <input id="nb_passager" type="number" name="nb_passager" class="form-control" placeholder="Saisir le nombre de passager">
+            </div>
+
+          <div class="mb-3">
+              <label for="date_achat" class="form-label">Date Achat</label>
+              <input id="date_achat" type="date" name="date_achat" class="form-control" placeholder="Saisir la date d'achat du bus">
+            </div>
+
+          <div class="mb-3">
+              <label for="entreprise_id" class="form-label">Entreprise</label>
+              <select id="entreprise_id" name="entreprise_id" class="form-select" required>
+                <option value="">Sélectionner une entreprise</option>
+                {% for type in entreprise %}
+                <option value="{{ type.id }}">{{ type.nom }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+
+              <div class="mb-3">
+              <label for="reservoir_id" class="form-label">Reservoir</label>
+              <select id="reservoir_id" name="reservoir_id" class="form-select jaune" required>
+                <option value="">Sélectionner un reservoir</option>
+                {% for type in reservoir %}
+                <option value="{{ type.id }}">{{ type.libelle_reservoir }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="d-grid">
+              <button type="submit" class="btn btn-success">Créer</button>
+            </div>
+
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

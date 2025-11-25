@@ -61,6 +61,9 @@ def activate_db_options(db):
 def show_accueil():
     return render_template('layout.html')
 
+
+# ########################################### Ctrl Technique
+
 @app.route('/ctrl-technique/show', methods=['GET'])
 def show_ctrl_technique():
     mycursor = get_db().cursor()
@@ -78,7 +81,7 @@ def show_ctrl_technique():
 
 @app.route('/ctrl-technique/add', methods=['GET'])
 def add_ctrl_technique():
-    print('''affichage du formulaire pour saisir une salle''')
+    print('''affichage du formulaire pour saisir un controle technique''')
     mycursor = get_db().cursor()
     sql = '''   SELECT id_bus AS id
                 FROM bus'''
@@ -212,6 +215,81 @@ def etat_ctrl_technique():
     stats_entreprise = mycursor.fetchall()
 
     return render_template('ctrl_technique/etat_ctrl_technique.html',stats_globales=stats_globales,stats_entreprise=stats_entreprise)
+
+
+# ########################################### BUS
+
+@app.route('/bus/show', methods=['GET'])
+def show_bus():
+    mycursor = get_db().cursor()
+    sql = '''  SELECT b.id_bus AS id, 
+               b.poids, 
+               b.nb_passager, 
+               b.date_achat, 
+               b.entreprise_id,
+               e.nom_entreprise AS nom,
+               r.libelle_reservoir
+        FROM bus b
+        JOIN entreprise e ON b.entreprise_id = e.id_entreprise
+        LEFT JOIN possede p ON b.id_bus = p.bus_id_possede
+        LEFT JOIN reservoir r ON p.reservoir_id_possede = r.id_reservoir
+        ORDER BY b.id_bus ASC
+         '''
+    mycursor.execute(sql)
+
+    liste_bus = mycursor.fetchall()
+    return render_template('bus/show_bus.html', bus=liste_bus)
+
+
+@app.route('/bus/add', methods=['GET'])
+def add_bus():
+    print('''affichage du formulaire pour saisir un bus''')
+    mycursor = get_db().cursor()
+    sql = '''   SELECT id_entreprise AS id, nom_entreprise AS nom
+                FROM entreprise
+                    '''
+    mycursor.execute(sql)
+    type_entreprise = mycursor.fetchall()
+
+    sql = '''   SELECT id_reservoir AS id, libelle_reservoir
+                FROM reservoir'''
+    mycursor.execute(sql)
+    type_reservoir = mycursor.fetchall()
+
+
+    return render_template('bus/add_bus.html', entreprise=type_entreprise, reservoir=type_reservoir)
+
+@app.route('/bus/add',methods=['POST'])
+def valid_add_bus():
+    poids = request.form.get('poids', '')
+    nb_passager = request.form.get('nb_passager', '')
+    date_achat = request.form.get('date_achat', '')
+    entreprise_id = request.form.get('entreprise_id', '')
+    reservoir_id = request.form.get('reservoir_id', '')
+
+    message = u'Bus ajouté, poids: ' + str(poids) + ' nb_passager: ' + str(nb_passager) + ' date_achat: ' + date_achat + ' entreprise: ' + entreprise_id + ' reservoir: ' + reservoir_id
+
+    mycursor = get_db().cursor()
+
+    tuple_param = (poids, nb_passager, date_achat, entreprise_id)
+    sql = '''INSERT INTO bus(id_bus, poids, nb_passager, date_achat, entreprise_id)
+             VALUES (NULL, %s, %s, %s, %s)'''
+
+    mycursor.execute(sql, tuple_param)
+
+    bus_id = mycursor.lastrowid
+    from datetime import date
+    date_installe = date.today()
+    tuple_param_possede = (bus_id, reservoir_id, date_installe)
+    sql_possede = '''INSERT INTO possede(bus_id_possede, reservoir_id_possede, date_installe)
+                         VALUES (%s, %s, %s)'''
+    mycursor.execute(sql_possede, tuple_param_possede)
+
+    get_db().commit()
+    flash(message, 'alert-success')
+    return redirect('/bus/show')
+
+
 
 
 if __name__ == '__main__':
