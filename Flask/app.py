@@ -217,7 +217,7 @@ def etat_ctrl_technique():
     return render_template('ctrl_technique/etat_ctrl_technique.html',stats_globales=stats_globales,stats_entreprise=stats_entreprise)
 
 
-# ########################################### BUS
+# ########################################### BUS ##########################################################
 
 @app.route('/bus/show', methods=['GET'])
 def show_bus():
@@ -290,7 +290,165 @@ def valid_add_bus():
     return redirect('/bus/show')
 
 
+@app.route('/bus/edit', methods=['GET'])
+def edit_bus():
+    print('''affichage du formulaire pour modifier un bus''')
+    print(request.args.get('id'))
+    id = request.args.get('id')
+    mycursor = get_db().cursor()
 
+    sql = '''SELECT b.id_bus,
+                    b.poids,
+                    b.nb_passager,
+                    b.date_achat           AS dateAchat,
+                    b.entreprise_id,
+                    p.reservoir_id_possede AS reservoir_id
+             FROM bus b
+                      LEFT JOIN possede p ON b.id_bus = p.bus_id_possede
+             WHERE b.id_bus = %s'''
+    mycursor.execute(sql, (id,))
+    bus = mycursor.fetchone()
+
+    sql = '''SELECT id_entreprise AS id, nom_entreprise AS nom
+             FROM entreprise'''
+    mycursor.execute(sql)
+    entreprises = mycursor.fetchall()
+
+    sql = '''SELECT id_reservoir AS id, libelle_reservoir
+             FROM reservoir'''
+    mycursor.execute(sql)
+    reservoirs = mycursor.fetchall()
+
+    return render_template('bus/edit_bus.html', bus=bus, entreprise=entreprises, reservoir=reservoirs)
+
+
+@app.route('/bus/edit', methods=['POST'])
+def valid_edit_bus():
+    print('''modification du bus''')
+    id = request.form.get('id', '')
+    poids = request.form.get('poids', '')
+    nb_passager = request.form.get('nb_passager', '')
+    date_achat = request.form.get('date_achat', '')
+    entreprise_id = request.form.get('entreprise_id', '')
+    reservoir_id = request.form.get('reservoir_id', '')
+
+    message = u'Bus modifié, id: ' + id + ' poids: ' + str(poids) + ' nb_passager: ' + str(
+        nb_passager) + ' date_achat: ' + date_achat + ' entreprise: ' + entreprise_id + ' reservoir: ' + reservoir_id
+    print(message)
+
+    mycursor = get_db().cursor()
+
+    tuple_param = (poids, nb_passager, date_achat, entreprise_id, id)
+    sql = '''UPDATE bus
+             SET poids         = %s,
+                 nb_passager   = %s,
+                 date_achat    = %s,
+                 entreprise_id = %s
+             WHERE id_bus = %s'''
+    mycursor.execute(sql, tuple_param)
+
+    from datetime import date
+    date_installe = date.today()
+
+    sql_delete = '''DELETE FROM possede 
+                   WHERE bus_id_possede = %s'''
+    mycursor.execute(sql_delete, (id,))
+
+    tuple_param_possede = (id, reservoir_id, date_installe)
+    sql_possede = '''INSERT INTO possede(bus_id_possede, reservoir_id_possede, date_installe)
+                     VALUES (%s, %s, %s)'''
+    mycursor.execute(sql_possede, tuple_param_possede)
+
+    get_db().commit()
+    flash(message, 'alert-success')
+    return redirect('/bus/show')
+
+
+
+@app.route('/bus/delete', methods=['GET'])
+def delete_bus():
+    print('''suppression d'un bus''')
+    print(request.args)
+    print(request.args.get('id'))
+    id = request.args.get('id')
+
+    mycursor = get_db().cursor()
+
+    sql = '''DELETE FROM consomme WHERE bus_id_consomme = %s'''
+    mycursor.execute(sql, (id,))
+
+    sql = '''DELETE FROM parcours WHERE bus_id_parcours = %s'''
+    mycursor.execute(sql, (id,))
+
+    sql = '''DELETE FROM se_ravitaille WHERE bus_id_ravitaille = %s'''
+    mycursor.execute(sql, (id,))
+
+    sql = '''DELETE FROM possede WHERE bus_id_possede = %s'''
+    mycursor.execute(sql, (id,))
+
+    sql = '''DELETE FROM controle_technique WHERE bus_id = %s'''
+    mycursor.execute(sql, (id,))
+
+    sql = '''DELETE FROM bus WHERE id_bus = %s'''
+    mycursor.execute(sql, (id,))
+
+    get_db().commit()
+
+    message = u'un bus a été supprimé, id : ' + id
+    print(message)
+    flash(message, 'alert-warning')
+    return redirect('/bus/show')
+
+
+@app.route('/etat/bus', methods=['GET'])
+def etat_bus():
+    mycursor = get_db().cursor()
+
+    sql = '''
+        SELECT COUNT(DISTINCT b.id_bus) AS total_bus,
+               AVG(b.poids) AS poids_moyen,
+               AVG(b.nb_passager) AS capacite_moyenne,
+               MAX(b.nb_passager) AS capacite_max,
+               MIN(b.nb_passager) AS capacite_min,
+               MAX(b.date_achat) AS achat_recent,
+               MIN(b.date_achat) AS achat_ancien,
+               COUNT(DISTINCT b.entreprise_id) AS nb_entreprises
+        FROM bus b
+    '''
+    mycursor.execute(sql)
+    stats_globales = mycursor.fetchone()
+
+    sql = '''
+        SELECT e.nom_entreprise,
+               COUNT(b.id_bus) AS nb_bus,
+               AVG(b.poids) AS poids_moyen,
+               AVG(b.nb_passager) AS capacite_moyenne,
+               SUM(b.nb_passager) AS capacite_totale
+        FROM bus b
+        JOIN entreprise e ON e.id_entreprise = b.entreprise_id
+        GROUP BY e.id_entreprise, e.nom_entreprise
+        ORDER BY nb_bus DESC
+    '''
+    mycursor.execute(sql)
+    stats_entreprise = mycursor.fetchall()
+
+    sql = '''
+        SELECT r.libelle_reservoir,
+               COUNT(DISTINCT p.bus_id_possede) AS nb_bus_equipes,
+               AVG(b.poids) AS poids_moyen_bus
+        FROM reservoir r
+        LEFT JOIN possede p ON r.id_reservoir = p.reservoir_id_possede
+        LEFT JOIN bus b ON b.id_bus = p.bus_id_possede
+        GROUP BY r.id_reservoir, r.libelle_reservoir
+        ORDER BY nb_bus_equipes DESC
+    '''
+    mycursor.execute(sql)
+    stats_reservoir = mycursor.fetchall()
+
+    return render_template('bus/etat_bus.html',
+                          stats_globales=stats_globales,
+                          stats_entreprise=stats_entreprise,
+                          stats_reservoir=stats_reservoir)
 
 if __name__ == '__main__':
     app.run()
