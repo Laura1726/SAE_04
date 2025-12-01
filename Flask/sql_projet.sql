@@ -83,8 +83,8 @@ CREATE TABLE maintenance(
 CREATE TABLE probleme(
     id_probleme INT AUTO_INCREMENT,
     descriptif_probleme VARCHAR(255),
-    date_probleme INT,
-    duree_maintenance DECIMAL,
+    date_probleme DATE,
+    duree_maintenance INT,
     categorie_id INT,
     maintenance_id INT,
     PRIMARY KEY (id_probleme),
@@ -175,10 +175,10 @@ VALUES ('2024-02-01', 'Révision annuelle', 1),
        ('2024-03-01', 'Remplacement soupape', 2),
        ('2024-04-01', 'Nettoyage complet', 3);
 
-INSERT INTO probleme (descriptif_probleme, categorie_id, maintenance_id)
-VALUES ('Fuite de pression', 1, 1),
-       ('Capteur défectueux', 2, 2),
-       ('Joint usé', 1, 3);
+INSERT INTO probleme (descriptif_probleme, date_probleme,duree_maintenance, categorie_id)
+VALUES ('Fuite de pression', '2024-12-30',30, 1, ),
+       ('Capteur défectueux','2025-10-29',7, 2, ),
+       ('Joint usé','2025-03-18',4, 1, );
 
 INSERT INTO se_ravitaille (bus_id_ravitaille, station_id_ravitaille, jj_mm_aaaa, quantite)
 VALUES (1, 1, '2024-01-05', 120.5),

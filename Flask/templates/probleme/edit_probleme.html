@@ -1,0 +1,76 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+<title>Modifier un problème</title>
+{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card shadow-lg">
+        <div class="card-header bg-primary text-white text-center">
+          <h4>Modifier un problème</h4>
+        </div>
+        <div class="card-body">
+          <form method="post" action="/probleme/edit">
+
+          <input type="hidden" name="id" value="{{ Probleme.id_Probleme }}">
+
+            <div class="mb-3">
+              <label for="dateProbleme" class="form-label">Date du problème</label>
+              <input id="dateProbleme" type="date" name="dateProbleme" class="form-control" value="{{ Probleme.dateProbleme }}" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="categorie_id" class="form-label">Catégorie problème</label>
+              <input id="categorie_id" type="number" name="categorie_id" class="form-control" value="{{ Probleme.categorie_id }}">
+            </div>
+
+            <div class="mb-3">
+              <label for="categorie_id" class="form-label">Bus</label>
+              <select id="categorie_id" name="categorie_id" class="form-select jaune" required>
+                <option value="">Sélectionner une catégorie</option>
+                {% for type in categorie %}
+                <option value="{{ type.id }}"
+                  {% if Probleme.id_probleme is defined and type.id == Probleme.bus_id %}selected{% endif %}>
+                  {{ type.id }}
+                </option>
+                {% endfor %}
+              </select>
+            </div
+
+              <div class="mb-3">
+              <label for="bus_id" class="form-label">Bus</label>
+              <select id="bus_id" name="bus_id" class="form-select jaune" required>
+                <option value="">Sélectionner un bus</option>
+                {% for type in bus %}
+                <option value="{{ type.id }}"
+                  {% if Probleme.id_probleme is defined and type.id == Probleme.bus_id %}selected{% endif %}>
+                  {{ type.id }}
+                </option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label for="duree_maintenance" class="form-label">Durée maintenance</label>
+              <input id="duree_maintenance" type="number" name="duree" class="form-control" value="{{ Probleme.duree_maintenance }}">
+            </div>
+
+            <div class="mb-3">
+              <label for="descriptif_probleme" class="form-label">Descriptif</label>
+              <input id="descriptif_probleme" type="text" name="descriptif_probleme" class="form-control" value="{{ Probleme.descriptif_probleme }}">
+            </div>
+
+            <div class="d-grid">
+              <button type="submit" class="btn btn-success">Modifier</button>
+            </div>
+
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

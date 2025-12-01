@@ -14,9 +14,9 @@ def get_db():
     if 'db' not in g:
         g.db =  pymysql.connect(
             host="localhost",                 # à modifier
-            user="lbornert",                     # à modifier
-            password="mon_mot_de_passe",                # à modifier
-            database="BDDDTP",        # à modifier
+            user="lfrichet",                     # à modifier
+            password="secret",                # à modifier
+            database="BDDIUT",        # à modifier
             charset='utf8mb4',
             cursorclass=pymysql.cursors.DictCursor
         )
@@ -449,6 +449,175 @@ def etat_bus():
                           stats_globales=stats_globales,
                           stats_entreprise=stats_entreprise,
                           stats_reservoir=stats_reservoir)
+
+########################################### PROBLÈME ##########################################################
+
+@app.route('/probleme/show', methods=['GET'])
+def show_probleme():
+    mycursor = get_db().cursor()
+    sql = '''  SELECT p.id_probleme AS id,
+                      p.descriptif_probleme,
+                      p.date_probleme AS date_probleme,
+                      p.duree_maintenance,
+                      c.categorie_id,
+                      b.bus_id
+        FROM probleme p
+        JOIN bus b ON b.id_bus = p.bus_id
+        JOIN categorie c ON c.id_categorie = b.categorie_id
+        ORDER BY duree_maintenance
+         '''
+    mycursor.execute(sql)
+
+    liste_control = mycursor.fetchall()
+    return render_template('probleme/show_probleme.html', Probleme=liste_control)
+
+
+@app.route('/probleme/add', methods=['GET'])
+def add_probleme():
+    print('''affichage du formulaire pour saisir un probleme''')
+    mycursor = get_db().cursor()
+    sql = '''   SELECT id_bus AS id
+                FROM bus'''
+    mycursor.execute(sql)
+
+    type_ctrl = mycursor.fetchall()
+    return render_template('probleme/add_probleme.html', bus=type_ctrl)
+
+@app.route('/probleme/add',methods=['POST'])
+def valid_add_probleme():
+    descriptif_probleme=request.form.get('descriptif_probleme','')
+    dateProbleme=request.form.get('dateProbleme','')
+    duree_maintenance=request.form.get('duree_maintenance','')
+    categorie_id=request.form.get('categorie_id','')
+    bus_id=request.form.get('bus_id','')
+
+    message = u'problème ajouté , dateProbleme : ' + dateProbleme + ' categorie_id: ' + categorie_id + ' bus_id: ' + str(bus_id) + ' duree: ' + str(duree_maintenance) + ' descriptif_probleme: ' + descriptif_probleme
+    print(message)
+
+    mycursor = get_db().cursor()
+    tuple_param = (descriptif_probleme, dateProbleme, duree_maintenance, categorie_id, bus_id)
+    sql = '''
+          INSERT INTO probleme(id_probleme,descriptif_probleme,dateProbleme,duree_maintenance,categorie_id,bus_id)
+          VALUES (NULL, %s, %s, %s, %s, %s); \
+          '''
+    print(sql, tuple_param)
+    mycursor.execute(sql, tuple_param)
+    get_db().commit()
+    flash(message, 'alert-success')
+    return redirect('/probleme/show')
+
+
+@app.route('/probleme/edit', methods=['GET'])
+def edit_probleme():
+    print('''affichage du formulaire pour modifier un probleme''')
+    print(request.args.get('id'))
+    id = request.args.get('id')
+    mycursor = get_db().cursor()
+    sql = '''   SELECT p.id_probleme AS id, \
+                        p.descriptif_probleme,\
+                       p.date_probleme         AS dateProbleme, \
+                        p.duree_maintenance,\
+                       p.categorie_id     AS categorie, \
+                       bus_id
+                FROM probleme p
+                WHERE p.id_probleme= %s;      '''
+    mycursor.execute(sql, (id,))
+    Probleme = mycursor.fetchone()
+
+    sql = '''   SELECT id_bus AS id
+                FROM bus '''
+    mycursor.execute(sql)
+    bus = mycursor.fetchall()
+
+    return render_template('probleme/edit_probleme.html', Probleme=Probleme, bus=bus)
+
+
+@app.route('/probleme/edit', methods=['POST'])
+def valid_edit_probleme():
+    print('''modification de la salle''')
+    id = request.form.get('id', '')
+    descriptif_probleme = request.form.get('descriptif_probleme', '')
+    dateProbleme = request.form.get('dateProbleme', '')
+    duree_maintenance = request.form.get('duree_maintenance', '')
+    categorie_id = request.form.get('categorie_id', '')
+    bus_id = request.form.get('bus_id', '')
+    message = u'type ajouté , id: ' + id + 'descriptif_probleme:' + descriptif_probleme + ' dateProbleme: ' + dateProbleme + ' duree_maintenance: ' + duree_maintenance + 'categorie_id' + categorie_id + ' bus_id: ' + bus_id
+    print(message)
+
+    tuple_param = (descriptif_probleme, dateProbleme, duree_maintenance, categorie_id, bus_id)
+    mycursor = get_db().cursor()
+    sql = '''
+          UPDATE probleme
+          SET descriptif_probleme= %s, \
+              date_probleme= %s, \
+              duree_maintenance= %s,
+              categorie_id= %s, \
+              bus_id= %s
+          WHERE id_probleme = %s;'''
+    mycursor.execute(sql, tuple_param)
+
+    get_db().commit()
+
+    flash(message, 'alert-success')
+    return redirect('/probleme/show')
+
+
+@app.route('/probleme/delete', methods=['GET'])
+def delete_probleme():
+    print('''suppression d'un probleme''')
+    print(request.args)
+    print(request.args.get('id'))
+    id = request.args.get('id')
+
+    tuple_param = (id)
+    mycursor = get_db().cursor()
+    sql = '''DELETE \
+             FROM probleme p \
+             WHERE id_probleme = %s; \
+          '''
+    mycursor.execute(sql, tuple_param)
+
+    get_db().commit()
+
+    message = u'un probleme a été supprimé, id : ' + id
+    print(message)
+    flash(message, 'alert-warning')
+    return redirect('/probleme/show')
+
+
+@app.route('/etat/probleme', methods=['GET'])
+def etat_probleme():
+    mycursor = get_db().cursor()
+
+    # stats global des controles techniques
+    sql= '''
+                         SELECT COUNT(DISTINCT ct.id_ctrl_technique) AS total_controles,
+                                COUNT(DISTINCT ct.bus_id) AS nb_bus_controles,
+                                AVG(ct.kilometrage) AS kilometrage_moyen,
+                                MAX(ct.kilometrage) AS kilometrage_max,
+                                MIN(ct.kilometrage) AS kilometrage_min,
+                                MAX(ct.date_controle_technique) AS dernier_controle,
+                                MIN(ct.date_controle_technique) AS premier_controle
+                         FROM controle_technique ct
+                         '''
+    mycursor.execute(sql)
+    stats_globales = mycursor.fetchone()
+
+    # stats par entreprise
+    sql = '''
+                           SELECT e.nom_entreprise,COUNT(ct.id_ctrl_technique) AS nb_controles,AVG(ct.kilometrage) AS km_moyen,COUNT(DISTINCT ct.bus_id) AS nb_bus_entreprise
+                           FROM controle_technique ct
+                            JOIN bus b ON b.id_bus = ct.bus_id
+                            JOIN entreprise e ON e.id_entreprise = b.entreprise_id
+                           GROUP BY e.id_entreprise, e.nom_entreprise
+                           ORDER BY nb_controles ASC
+                           '''
+    mycursor.execute(sql)
+    stats_entreprise = mycursor.fetchall()
+
+    return render_template('probleme/etat_probleme.html',stats_globales=stats_globales,stats_entreprise=stats_entreprise)
+
+
 
 if __name__ == '__main__':
     app.run()

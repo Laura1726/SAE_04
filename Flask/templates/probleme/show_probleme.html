@@ -1,0 +1,62 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+<title>Afficher les problèmes</title>
+{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-10">
+      <div class="card shadow-lg">
+        <div class="card-header bg-primary text-white text-center">
+          <h4>Problèmes</h4>
+        </div>
+        <div class="card-body text-center">
+          <a href="/probleme/add" class="btn btn-success mb-4">Ajouter un problème</a>
+
+          <div class="table-responsive">
+            <table class="table table-striped table-bordered align-middle">
+              <thead class="table-dark">
+                <tr>
+                  <th>ID</th>
+                  <th>Descriptif problème</th>
+                    <th>Date problème</th>
+                    <th>Durée maintenance (en jours)</th>
+                    <th>Catégorie</th>
+                    <th>ID Bus</th>
+                  <th>Opérations</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% if Probleme | length >= 1 %}
+                  {% for ligne in Probleme %}
+                    <tr>
+                      <td>{{ ligne.id }}</td>
+                        <td>{{ ligne.descriptif_probleme }}</td>
+                        <td>{{ ligne.date_probleme }}</td>
+                        <td>{{ ligne.duree_maintenance }}</td>
+                        <td>{{ ligne.categorie_id }}</td>
+                      <td>{{ ligne.bus_id }}</td>
+                      <td>
+                        <a href="/probleme/edit?id={{ ligne.id }}" class="btn btn-warning btn-sm me-2">Éditer</a>
+                        <a href="/probleme/delete?id={{ ligne.id }}" class="btn btn-danger btn-sm">Supprimer</a>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                {% else %}
+                  <tr>
+                    <td colspan="4" class="text-center text-muted">
+                      Aucun controle technique enregistré
+                    </td>
+                  </tr>
+                {% endif %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
