@@ -176,7 +176,7 @@ VALUES ('2024-02-01', 'Révision annuelle', 1),
        ('2024-04-01', 'Nettoyage complet', 3);
 
 INSERT INTO probleme (descriptif_probleme, date_probleme,duree_maintenance, categorie_id)
-VALUES ('Fuite de pression', '2024-12-30',30, 1, ),
+VALUES ('Fuite de pression', '2024-12-30',45, 1, ),
        ('Capteur défectueux','2025-10-29',7, 2, ),
        ('Joint usé','2025-03-18',4, 1, );
 

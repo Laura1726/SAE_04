@@ -498,7 +498,7 @@ def valid_add_probleme():
     tuple_param = (descriptif_probleme, dateProbleme, duree_maintenance, categorie_id, bus_id)
     sql = '''
           INSERT INTO probleme(id_probleme,descriptif_probleme,dateProbleme,duree_maintenance,categorie_id,bus_id)
-          VALUES (NULL, %s, %s, %s, %s, %s); \
+          VALUES (NULL, %s, %s, %s, %s, %s);\
           '''
     print(sql, tuple_param)
     mycursor.execute(sql, tuple_param)
