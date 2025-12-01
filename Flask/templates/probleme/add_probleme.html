@@ -32,7 +32,7 @@
 
             <div class="mb-3">
               <label for="categorie_id" class="form-label">Catégorie</label>
-              <select id="categorie_id" name="categorie_id" class="form-select jaune" required>
+              <select id="categorie_id" name="categorie_id" class="form-select jaune">
                 <option value="">Sélectionner une catégorie</option>
                 {% for type in categorie %}
                 <option value="{{ type.id }}">{{ type.id }}</option>
@@ -52,7 +52,7 @@
 
             <div class="mb-3">
               <label for="duree_maintenance" class="form-label">Durée maintenance</label>
-              <input id="duree_maintenance" type="number" name="duree_maintenance" class="form-control" placeholder="Saisir la durée de maintenance du véhicule (en heures)">
+              <input id="duree_maintenance" type="number" name="duree_maintenance" class="form-control" placeholder="Saisir la durée de maintenance du véhicule (en heures)" required>
             </div>
 
             <div class="d-grid">
