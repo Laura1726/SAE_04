@@ -14,9 +14,9 @@ def get_db():
     if 'db' not in g:
         g.db =  pymysql.connect(
             host="localhost",                 # à modifier
-            user="lfrichet",                     # à modifier
-            password="secret",                # à modifier
-            database="BDDIUT",        # à modifier
+            user="lbornert",                     # à modifier
+            password="mon_mot_de_passe",                # à modifier
+            database="BDDDTP",        # à modifier
             charset='utf8mb4',
             cursorclass=pymysql.cursors.DictCursor
         )
@@ -459,11 +459,9 @@ def show_probleme():
                       p.descriptif_probleme,
                       p.date_probleme AS date_probleme,
                       p.duree_maintenance,
-                      c.categorie_id,
-                      b.bus_id
+                      c.libelle_categorie
         FROM probleme p
-        JOIN bus b ON b.id_bus = p.bus_id
-        JOIN categorie c ON c.id_categorie = b.categorie_id
+        JOIN categorie c ON c.id_categorie = p.categorie_id
         ORDER BY duree_maintenance
          '''
     mycursor.execute(sql)
@@ -476,35 +474,45 @@ def show_probleme():
 def add_probleme():
     print('''affichage du formulaire pour saisir un probleme''')
     mycursor = get_db().cursor()
-    sql = '''   SELECT id_bus AS id
-                FROM bus'''
-    mycursor.execute(sql)
 
+    sql = '''SELECT id_categorie AS id, libelle_categorie
+             FROM categorie'''
+    mycursor.execute(sql)
     type_ctrl = mycursor.fetchall()
-    return render_template('probleme/add_probleme.html', bus=type_ctrl)
+
+    sql = '''SELECT id_maintenance AS id, descriptif, date_revision
+             FROM maintenance
+             ORDER BY date_revision DESC'''
+    mycursor.execute(sql)
+    maintenances = mycursor.fetchall()
+
+    return render_template('probleme/add_probleme.html', categorie=type_ctrl, maintenance=maintenances)
 
 @app.route('/probleme/add',methods=['POST'])
 def valid_add_probleme():
-    descriptif_probleme=request.form.get('descriptif_probleme','')
-    dateProbleme=request.form.get('dateProbleme','')
-    duree_maintenance=request.form.get('duree_maintenance','')
-    categorie_id=request.form.get('categorie_id','')
-    bus_id=request.form.get('bus_id','')
+    descriptif_probleme = request.form.get('descriptif_probleme','')
+    dateProbleme = request.form.get('dateProbleme','')
+    duree_maintenance = request.form.get('duree_maintenance','')
+    categorie_id = request.form.get('categorie_id','')
+    maintenance_id = request.form.get('maintenance_id','')
 
-    message = u'problème ajouté , dateProbleme : ' + dateProbleme + ' categorie_id: ' + categorie_id + ' bus_id: ' + str(bus_id) + ' duree: ' + str(duree_maintenance) + ' descriptif_probleme: ' + descriptif_probleme
+    message = u'problème ajouté, descriptif_probleme: ' + descriptif_probleme + 'dateProbleme : ' + dateProbleme + ' categorie_id: ' + categorie_id + ' maintenance_id: ' + str(maintenance_id) + ' duree: ' + str(duree_maintenance)
     print(message)
 
     mycursor = get_db().cursor()
-    tuple_param = (descriptif_probleme, dateProbleme, duree_maintenance, categorie_id, bus_id)
+    tuple_param = (descriptif_probleme, dateProbleme, duree_maintenance, categorie_id, maintenance_id)
     sql = '''
-          INSERT INTO probleme(id_probleme,descriptif_probleme,dateProbleme,duree_maintenance,categorie_id,bus_id)
-          VALUES (NULL, %s, %s, %s, %s, %s);\
+          INSERT INTO probleme(id_probleme, descriptif_probleme, date_probleme, duree_maintenance, categorie_id, maintenance_id)
+          VALUES (NULL, %s, %s, %s, %s, %s);
           '''
     print(sql, tuple_param)
     mycursor.execute(sql, tuple_param)
     get_db().commit()
     flash(message, 'alert-success')
     return redirect('/probleme/show')
+
+
+
 
 
 @app.route('/probleme/edit', methods=['GET'])

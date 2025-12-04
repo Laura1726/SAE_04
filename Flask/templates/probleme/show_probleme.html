@@ -24,7 +24,6 @@
                     <th>Date problème</th>
                     <th>Durée maintenance (en nbr de jours)</th>
                     <th>Catégorie</th>
-                    <th>ID Bus</th>
                   <th>Opérations</th>
                 </tr>
               </thead>
@@ -36,8 +35,7 @@
                         <td>{{ ligne.descriptif_probleme }}</td>
                         <td>{{ ligne.date_probleme }}</td>
                         <td>{{ ligne.duree_maintenance }}</td>
-                        <td>{{ ligne.categorie_id }}</td>
-                      <td>{{ ligne.bus_id }}</td>
+                        <td>{{ ligne.libelle_categorie }}</td>
                       <td>
                         <a href="/probleme/edit?id={{ ligne.id }}" class="btn btn-warning btn-sm me-2">Éditer</a>
                         <a href="/probleme/delete?id={{ ligne.id }}" class="btn btn-danger btn-sm">Supprimer</a>
